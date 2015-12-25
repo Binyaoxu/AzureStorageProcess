@@ -32,7 +32,11 @@ namespace StorageProcess.TableHelpers
         /// <param name="ct">token</param>
         /// <param name="onProgress">on Progress</param>
         /// <returns></returns>
-        public static async Task<IList<T>> ExecuteQueryAsync<T>(this CloudTable table, TableQuery<T> query, CancellationToken ct = default(CancellationToken), Action<IList<T>> onProgress = null) where T : ITableEntity, new()
+        public static async Task<IList<T>> ExecuteQueryAsync<T>(
+            this CloudTable table,
+            TableQuery<T> query,
+            CancellationToken ct = default(CancellationToken),
+            Action<IList<T>> onProgress = null) where T : ITableEntity, new()
         {
             var items = new List<T>();
             TableContinuationToken token = null;

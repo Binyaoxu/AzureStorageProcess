@@ -11,15 +11,15 @@ using StorageProcess.Entity;
 using StorageProcess.GetCloudStorageAccounts;
 using StorageProcess.Logger;
 using StorageProcess.TableStorage;
-
+using Microsoft.WindowsAzure;
 
 namespace StorageProcess
 {
     class Program
     {
         #region
-        public static int InsertDataCount = Convert.ToInt32(ConfigurationSettings.AppSettings.Get("InsertDataCount"));
-        public static int RunInsertDataCount = Convert.ToInt32(ConfigurationSettings.AppSettings.Get("RunInsertDataCount"));        
+        public static int InsertDataCount = Convert.ToInt32(CloudConfigurationManager.GetSetting("InsertDataCount"));
+        public static int RunInsertDataCount = Convert.ToInt32(CloudConfigurationManager.GetSetting("RunInsertDataCount"));
         public static int takeCount = InsertDataCount / 10;
 
         private static string containerName = "testcontainer";
@@ -85,7 +85,7 @@ namespace StorageProcess
             List<CustomerEntity> insertEntityList = CustomerEntityUtility.CreateCustomerEntity(InsertDataCount);
 
             string serializeListEntity = JsonConvert.SerializeObject(insertEntityList);
-            
+
             string currentBlobName = BlobName + DateTime.Now.ToString("yyyyMMddhhmmss").ToString();
             await blobStorage.CreateBlockBlobString(currentBlobName, "application/json", serializeListEntity);
 
@@ -123,9 +123,9 @@ namespace StorageProcess
             List<CustomerEntity> getTableResult = new List<CustomerEntity>();
 
             getTableResult = tableStorage.GetEntitiesByPartitionKey("Jonathan").Result.ToList();
-            var getSameEntity = from a in getTableResult join b in insertEntityList on a.RowKey equals b.RowKey select new { a, b };
 
-            if (getTableResult.Count == insertEntityList.Count && insertEntityList.Count == getSameEntity.Count())
+            if (getTableResult.Count == insertEntityList.Count &&
+                insertEntityList.Count == GetSameEntities(getTableResult, insertEntityList).Count())
             {
                 Log.Info("GetEntitiesByPartitionKey from Table Success, Count:{0}", getTableResult.Count);
             }
@@ -136,13 +136,11 @@ namespace StorageProcess
             }
 
             getTableResult = new List<CustomerEntity>();
-            string startRowKey = InsertDataCount <= 10000 ? "0" + (insertEntityList.Count / 2).ToString() : (insertEntityList.Count / 2).ToString();
-            string endRowkey = InsertDataCount <= 10000 ? "0" + (insertEntityList.Count / 2 + takeCount).ToString() : (insertEntityList.Count / 2 + takeCount).ToString();
 
-            getTableResult = tableStorage.GetEntitiesByRowKeyAsync(startRowKey, endRowkey).Result.ToList();
-            getSameEntity = from a in getTableResult join b in insertEntityList on a.RowKey equals b.RowKey select new { a, b };
+            getTableResult = tableStorage.GetEntitiesByRowKeyAsync(StartRowKey(), EndRowKey()).Result.ToList();
 
-            if (getTableResult.Count == takeCount && takeCount == getSameEntity.Count())
+            if (getTableResult.Count == takeCount &&
+                takeCount == GetSameEntities(getTableResult, insertEntityList).Count())
             {
                 Log.Info("GetEntitiesByRowKey from Table Success, Count:{0}", getTableResult.Count);
                 tableStorage.DeleteTable();
@@ -154,6 +152,30 @@ namespace StorageProcess
             }
         }
 
+        private static string StartRowKey()
+        {
+            int num = InsertDataCount / 2;
+            string result = num.ToString();
+            while (result.Length != InsertDataCount.ToString().Length)
+            {
+                result = "0" + result;
+            }
+
+            return result;
+        }
+
+        private static string EndRowKey()
+        {
+            int num = InsertDataCount / 2 + InsertDataCount / 10;
+            string result = num.ToString();
+            while (result.Length != InsertDataCount.ToString().Length)
+            {
+                result = "0" + result;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Get the average time span
         /// </summary>
@@ -162,6 +184,19 @@ namespace StorageProcess
         private static TimeSpan? GetTimeSpanAverage(List<TimeSpan> sourceList)
         {
             return TimeSpan.FromMilliseconds(sourceList.Average(i => i.TotalMilliseconds));
+        }
+
+        /// <summary>
+        /// Get the same entities 
+        /// </summary>
+        /// <param name="entities1">Entities 1</param>
+        /// <param name="entities2">Entities 2</param>
+        /// <returns></returns>
+        private static IEnumerable<CustomerEntity> GetSameEntities(List<CustomerEntity> entities1, List<CustomerEntity> entities2)
+        {
+            IEnumerable<CustomerEntity> getSameEntity;
+            getSameEntity = from a in entities1 join b in entities2 on a.RowKey equals b.RowKey into result from c in result select c;
+            return getSameEntity;
         }
     }
 }
