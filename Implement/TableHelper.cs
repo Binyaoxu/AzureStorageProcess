@@ -21,7 +21,7 @@ namespace StorageProcess.TableHelpers
         }
     }
 
-    public static class TableHelpers
+    public static class TableHelper
     {
         /// <summary>
         /// ExecuteQueryAsync
@@ -67,6 +67,38 @@ namespace StorageProcess.TableHelpers
                 yield return source.Take(chunksize);
                 source = source.Skip(chunksize);
             }
+        }
+
+        /// <summary>
+        /// Get the Query Start Row Key
+        /// </summary>
+        /// <returns></returns>
+        public static string StartRowKey(int insertDataCount)
+        {
+            int num = insertDataCount / 2;
+            string result = num.ToString();
+            while (result.Length != insertDataCount.ToString().Length)
+            {
+                result = "0" + result;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Get the query endrow Key
+        /// </summary>
+        /// <returns></returns>
+        public static string EndRowKey(int insertDataCount)
+        {
+            int num = insertDataCount / 2 + insertDataCount / 10;
+            string result = num.ToString();
+            while (result.Length != insertDataCount.ToString().Length)
+            {
+                result = "0" + result;
+            }
+
+            return result;
         }
     }
 }

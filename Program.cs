@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Configuration;
+using StorageProcess.TableHelpers;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
@@ -91,9 +91,9 @@ namespace StorageProcess
 
             string getJsonObject = await blobStorage.GetBlockBlobDataString(currentBlobName);
             List<CustomerEntity> getListEntity = JsonConvert.DeserializeObject<List<CustomerEntity>>(getJsonObject).ToList();
-            var getSameEntity = from a in getListEntity join b in insertEntityList on a.RowKey equals b.RowKey select new { a, b };
 
-            if (getListEntity.Count == insertEntityList.Count && insertEntityList.Count == getSameEntity.Count())
+            if (getListEntity.Count == insertEntityList.Count &&
+                insertEntityList.Count == GetSameEntities(getListEntity, insertEntityList).Count())
             {
 
                 Log.Info("Get blob Data success, Count:{0}", getListEntity.Count);
@@ -137,7 +137,9 @@ namespace StorageProcess
 
             getTableResult = new List<CustomerEntity>();
 
-            getTableResult = tableStorage.GetEntitiesByRowKeyAsync(StartRowKey(), EndRowKey()).Result.ToList();
+            getTableResult = tableStorage.GetEntitiesByRowKeyAsync(
+                TableHelper.StartRowKey(InsertDataCount),
+                TableHelper.EndRowKey(InsertDataCount)).Result.ToList();
 
             if (getTableResult.Count == takeCount &&
                 takeCount == GetSameEntities(getTableResult, insertEntityList).Count())
@@ -150,30 +152,6 @@ namespace StorageProcess
                 Log.Error("GetEntitiesByRowKey from Table Fail, Expect Count:{0}, Actual Count:{1}, table name:{2}",
                     insertEntityList.Count, getTableResult.Count, currentTableName);
             }
-        }
-
-        private static string StartRowKey()
-        {
-            int num = InsertDataCount / 2;
-            string result = num.ToString();
-            while (result.Length != InsertDataCount.ToString().Length)
-            {
-                result = "0" + result;
-            }
-
-            return result;
-        }
-
-        private static string EndRowKey()
-        {
-            int num = InsertDataCount / 2 + InsertDataCount / 10;
-            string result = num.ToString();
-            while (result.Length != InsertDataCount.ToString().Length)
-            {
-                result = "0" + result;
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -195,7 +173,12 @@ namespace StorageProcess
         private static IEnumerable<CustomerEntity> GetSameEntities(List<CustomerEntity> entities1, List<CustomerEntity> entities2)
         {
             IEnumerable<CustomerEntity> getSameEntity;
-            getSameEntity = from a in entities1 join b in entities2 on a.RowKey equals b.RowKey into result from c in result select c;
+            getSameEntity = from a in entities1
+                            join b in entities2 on a.RowKey
+                            equals b.RowKey into result
+                            from c in result
+                            select c;
+
             return getSameEntity;
         }
     }
