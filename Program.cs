@@ -114,6 +114,8 @@ namespace StorageProcess
         {
             CloudStorageAccount storageAccount = GetCloudStorageAccount.CreateStorageAccount();
             string currentTableName = TableName + DateTime.Now.ToString("yyyyMMddhhmmss").ToString();
+            //string currentTableName = "testtable20151225090911";
+
             tableStorage = new TableStorage<CustomerEntity>(storageAccount, currentTableName);
 
             List<CustomerEntity> insertEntityList = CustomerEntityUtility.CreateCustomerEntity(InsertDataCount);
@@ -145,7 +147,7 @@ namespace StorageProcess
                 takeCount == GetSameEntities(getTableResult, insertEntityList).Count())
             {
                 Log.Info("GetEntitiesByRowKey from Table Success, Count:{0}", getTableResult.Count);
-                tableStorage.DeleteTable();
+                //tableStorage.DeleteTable();
             }
             else
             {

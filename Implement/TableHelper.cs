@@ -77,7 +77,7 @@ namespace StorageProcess.TableHelpers
         {
             int num = insertDataCount / 2;
             string result = num.ToString();
-            while (result.Length != insertDataCount.ToString().Length)
+            while (result.Length < 5)
             {
                 result = "0" + result;
             }
@@ -93,7 +93,7 @@ namespace StorageProcess.TableHelpers
         {
             int num = insertDataCount / 2 + insertDataCount / 10;
             string result = num.ToString();
-            while (result.Length != insertDataCount.ToString().Length)
+            while (result.Length < 5)
             {
                 result = "0" + result;
             }
