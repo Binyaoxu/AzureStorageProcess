@@ -90,4 +90,3 @@ D:\GitWorkStation\AzureStorageProcess\bin\Debug\ko\System.Spatial.resources.dll
 D:\GitWorkStation\AzureStorageProcess\bin\Debug\ru\System.Spatial.resources.dll
 D:\GitWorkStation\AzureStorageProcess\bin\Debug\zh-Hans\System.Spatial.resources.dll
 D:\GitWorkStation\AzureStorageProcess\bin\Debug\zh-Hant\System.Spatial.resources.dll
-D:\GitWorkStation\AzureStorageProcess\obj\Debug\StorageProcess.csprojResolveAssemblyReference.cache

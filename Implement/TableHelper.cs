@@ -73,7 +73,7 @@ namespace StorageProcess.TableHelpers
         /// Get the Query Start Row Key
         /// </summary>
         /// <returns></returns>
-        public static string StartRowKey(int insertDataCount)
+        public static string StartRowKey(this int insertDataCount)
         {
             int num = insertDataCount / 2;
             string result = num.ToString();
@@ -89,7 +89,7 @@ namespace StorageProcess.TableHelpers
         /// Get the query endrow Key
         /// </summary>
         /// <returns></returns>
-        public static string EndRowKey(int insertDataCount)
+        public static string EndRowKey(this int insertDataCount)
         {
             int num = insertDataCount / 2 + insertDataCount / 10;
             string result = num.ToString();

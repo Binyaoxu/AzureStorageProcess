@@ -13,9 +13,13 @@ using System.Threading.Tasks;
 
 namespace StorageProcess
 {
-   public class DropTestData
+    public class DropTestData
     {
-        public static void  DropBlobContainer(string blobContainerPrefix)
+        /// <summary>
+        /// Drop Blob Container according to blob container prefix
+        /// </summary>
+        /// <param name="blobContainerPrefix">blobContainerPrefix</param>
+        public static void DropBlobContainer(string blobContainerPrefix)
         {
             CloudStorageAccount storageAccount = GetCloudStorageAccount.CreateStorageAccount();
             BlobStorage blobStorage = new BlobStorage(storageAccount);
@@ -30,6 +34,10 @@ namespace StorageProcess
             }
         }
 
+        /// <summary>
+        /// Drop Table according to table prefix
+        /// </summary>
+        /// <param name="tablePrefix">tablePrefix</param>
         public static void DropTable(string tablePrefix)
         {
             CloudStorageAccount storageAccount = GetCloudStorageAccount.CreateStorageAccount();

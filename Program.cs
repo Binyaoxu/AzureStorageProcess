@@ -82,7 +82,7 @@ namespace StorageProcess
             string TestContainerName = containerName + DateTime.Now.ToString("yyyyMMddhhmmss").ToString();
             blobStorage = new BlobStorage(storageAccount, TestContainerName, BlobContainerPublicAccessType.Blob);
 
-            List<CustomerEntity> insertEntityList = CustomerEntityUtility.CreateCustomerEntity(InsertDataCount);
+            List<CustomerEntity> insertEntityList = InsertDataCount.CreateCustomerEntity();
 
             string serializeListEntity = JsonConvert.SerializeObject(insertEntityList);
 
@@ -97,7 +97,7 @@ namespace StorageProcess
             {
 
                 Log.Info("Get blob Data success, Count:{0}", getListEntity.Count);
-                blobStorage.DeleteContainer();
+                //blobStorage.DeleteContainer();
             }
             else
             {
@@ -118,7 +118,7 @@ namespace StorageProcess
 
             tableStorage = new TableStorage<CustomerEntity>(storageAccount, currentTableName);
 
-            List<CustomerEntity> insertEntityList = CustomerEntityUtility.CreateCustomerEntity(InsertDataCount);
+            List<CustomerEntity> insertEntityList = InsertDataCount.CreateCustomerEntity();
 
             await tableStorage.CreateEntities(insertEntityList);
 
@@ -140,8 +140,8 @@ namespace StorageProcess
             getTableResult = new List<CustomerEntity>();
 
             getTableResult = tableStorage.GetEntitiesByRowKeyAsync(
-                TableHelper.StartRowKey(InsertDataCount),
-                TableHelper.EndRowKey(InsertDataCount)).Result.ToList();
+                InsertDataCount.StartRowKey(),
+                InsertDataCount.EndRowKey()).Result.ToList();
 
             if (getTableResult.Count == takeCount &&
                 takeCount == GetSameEntities(getTableResult, insertEntityList).Count())

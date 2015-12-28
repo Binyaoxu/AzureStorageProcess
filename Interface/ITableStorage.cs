@@ -25,6 +25,26 @@ namespace StorageProcess.TableStorageInterface
         Task<IEnumerable<T>> GetEntitiesByPartitionKey(string partitionKey);
 
         /// <summary>
+        ///  GetEntitiesByRowKeyAsync
+        /// </summary>
+        /// <param name="startRowKey">startRowKey</param>
+        /// <param name="endRowKey">endRowKey</param>
+        /// <returns>IEnumerable<T></returns>
+        Task<IEnumerable<T>> GetEntitiesByRowKeyAsync(string startRowKey, string endRowKey);
+
+        /// <summary>
+        /// ListAllContainer
+        /// </summary>
+        /// <returns>IEnumerable<CloudTable></returns>
+        IEnumerable<CloudTable> ListAllContainer();
+
+        /// <summary>
+        ///  DeleteTable
+        /// </summary>
+        /// <param name="cloudTable"></param>
+        void DeleteTable(CloudTable cloudTable);
+
+        /// <summary>
         /// Delete Table
         /// </summary>
         void DeleteTable();

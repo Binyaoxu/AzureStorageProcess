@@ -27,7 +27,7 @@ namespace StorageProcess.Entity
 
     public static class CustomerEntityUtility
     {
-        public static List<CustomerEntity> CreateCustomerEntity(int insertDataCount)
+        public static List<CustomerEntity> CreateCustomerEntity(this int insertDataCount)
         {
             List<CustomerEntity> insertEntityList = new List<CustomerEntity>();
              
